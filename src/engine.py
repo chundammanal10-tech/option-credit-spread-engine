@@ -79,3 +79,25 @@ class AutonomousTradingEngine:
             "win_rate": round(win_rate, 2),
             "ml_recommendation": recommendation
         }
+def advanced_trade_filter(ticker_data):
+    """
+    Institutional filter: Checks IVR, Trend, and RSI before approving a trade.
+    """
+    iv_rank = ticker_data.get("iv_rank", 0)
+    spot_price = ticker_data.price
+    ema_50 = ticker_data.get("ema_50", spot_price)
+    rsi = ticker_data.get("rsi", 50)
+    
+    # Check 1: IVR Filter
+    if iv_rank < 35:
+        return False, "Rejected: IV Rank too low (< 35). Insufficient premium edge."
+        
+    # Check 2: Trend Filter
+    if spot_price < ema_50:
+        return False, "Rejected: Underlying trading below 50 EMA. Bearish momentum risk."
+        
+    # Check 3: RSI Pullback Filter
+    if not (30 <= rsi <= 45):
+        return False, "Rejected: RSI not in optimal pullback zone (30-45)."
+        
+    return True, "Approved: High-probability credit spread setup."
