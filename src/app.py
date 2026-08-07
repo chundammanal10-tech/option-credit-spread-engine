@@ -1,30 +1,51 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 
-st.set_page_config(page_title="Option Credit Spread Engine", layout="wide")
+st.set_page_config(page_title="Master Trader Dashboard", layout="wide")
 
-st.title("📈 Option Credit Spread Signal Dashboard")
-st.markdown("Live scanning engine targeting high-probability credit spreads across **3, 7, 15, 21, and 30 DTE**.")
+# Custom CSS for Mobile Optimization
+st.markdown("""
+    <style>
+    .stDataFrame {width: 100% !important;}
+    .reportview-container {padding: 10px;}
+    </style>
+""", unsafe_allow_html=True)
 
-# Sidebar configuration
-st.sidebar.header("Scan Parameters")
-selected_dte = st.sidebar.multiselect("Select DTE Expirations", [3, 7, 15, 21, 30], default=[7, 21, 30])
-min_iv_rank = st.sidebar.slider("Minimum IV Rank", 0, 100, 30)
+tabs = st.tabs(["🚀 Trading Cockpit", "🌍 Macro & Catalyst Intel"])
 
-st.subheader("Current High-Probability Signals")
+# --- TAB 1: TRADING COCKPIT ---
+with tabs[0]:
+    st.header("Credit Spread Signal Engine")
+    
+    # Mock data structured for Robinhood execution
+    data = {
+        "Ticker": ["SPY", "QQQ", "IWM"],
+        "DTE": [30, 45, 30],
+        "Type": ["Bull Put", "Bear Call", "Bull Put"],
+        "Short Strike": [540, 490, 205],
+        "Long Strike": [535, 495, 200],
+        "Delta": [0.20, 0.22, 0.18],
+        "Credit/Width": ["1/3", "1/3", "1/3"],
+        "Action": ["Trade in Robinhood", "Trade in Robinhood", "Trade in Robinhood"]
+    }
+    df = pd.DataFrame(data)
+    st.table(df) # Table displays better on mobile than st.dataframe
+    
+    st.info("Strategy: Target 15-25 Delta, 30-45 DTE. Close at 50% profit. Risk = 2x credit.")
 
-# Placeholder Dataframe for Signals
-data = {
-    "Ticker": ["SPY", "QQQ", "IWM", "SPY"],
-    "DTE": [7, 15, 21, 30],
-    "Type": ["Put Spread", "Put Spread", "Call Spread", "Put Spread"],
-    "Strikes": ["550/545", "480/475", "210/215", "540/535"],
-    "Credit ($)": [0.65, 1.20, 0.95, 1.45],
-    "Probability of Profit": ["84%", "79%", "81%", "86%"],
-    "IV Rank": [42, 38, 55, 40]
-}
-df = pd.DataFrame(data)
-
-filtered_df = df[df["DTE"].isin(selected_dte)]
-st.dataframe(filtered_df, use_container_width=True)
+# --- TAB 2: MARKET INTEL ---
+with tabs[1]:
+    st.header("Macro & Catalyst Intelligence")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.subheader("Market Pulse")
+        st.write("• **10-Year Bond Rate:** 4.2% (Trending Down - Bullish for Equities)")
+        st.write("• **Gold (GLD):** Oversold (Look for Mean Reversion)")
+    with col2:
+        st.subheader("Catalysts & Sentiment")
+        st.write("• **Inverse Cramer:** Currently betting against [Sector X]")
+        st.write("• **Politician Trades:** Unusual activity in [Ticker Y]")
+        st.write("• **Market Sentiment:** Fear/Greed Index = 65 (Neutral/Greed)")
+    
+    st.warning("Catalyst Watch: FOMC Minutes release on Wednesday. Reduce position sizing.")
